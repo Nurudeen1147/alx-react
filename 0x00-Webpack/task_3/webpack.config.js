@@ -1,67 +1,71 @@
+const path = require("path");
+const HTMLWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
 
 module.exports = {
-  mode: 'development',
-  devtool: 'inline-source-map',
-  entry: {
-    header: {
-      import: './modules/header/header.js',
-      dependOn: 'shared',
-    },
-    body: {
-      import: './modules/body/body.js',
-      dependOn: 'shared',
-    },
-    footer: {
-      import: './modules/footer/footer.js',
-      dependOn: 'shared',
-    },
-    shared: 'jquery',
-  },
+  plugins: [
+		new HTMLWebpackPlugin({
+			filename: './index.html',
+		}),
+		new CleanWebpackPlugin(),
+	],
+	devtool: 'inline-source-map',
+	mode: 'development',
+	entry: {
+		header: {
+			import: './modules/header/header.js',
+			dependOn: 'shared',
+		},
+		body: {
+			import: './modules/body/body.js',
+			dependOn: 'shared',
+		},
+		footer: {
+			import: './modules/footer/footer.js',
+			dependOn: 'shared',
+		},
+		shared: 'jquery',
+	},
   output: {
     path: path.resolve(__dirname, 'public'),
     filename: '[name].bundle.js',
   },
   optimization: {
-    splitChunks: {
-      chunks: 'all',
-    },
-  },
-  devServer: {
-    static: path.join(__dirname, 'public'),
-    open: true,
-    port: 8564,
-  },
+		splitChunks: {
+			chunks: 'all',
+		},
+	},
   performance: {
-    maxAssetSize: 512000,
+		maxAssetSize: 1000000,
+    maxEntrypointSize: 1000000,
+	},
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
+    compress: true,
+    port: 8564,
   },
   module: {
     rules: [
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
-        test: /\.jpg$/i,
+        test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+        type: 'asset/resource',
         use: [
           'file-loader',
-          {
-            loader: 'image-webpack-loader',
-            options: {
-              bypassingOnDebug: true,
-              disable: true,
-            },
-          },
-        ],
+					{
+						loader: 'image-webpack-loader',
+						options: {
+							bypassOnDebug: true,
+							disable: true,
+						},
+					},
+				],
       },
-    ],
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      filename: './index.html',
-    }),
-    new CleanWebpackPlugin(),
-  ],
+    ]
+  }
 };
